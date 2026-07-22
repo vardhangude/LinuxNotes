@@ -1,0 +1,656 @@
+# Module 4 – Linux Interview Handbook (Part 2)
+## grep | sed | awk | cut
+### Target: 4+ Years Linux Administrator | DevOps Engineer | Cloud Engineer
+
+> This section focuses on the Linux commands most frequently used in production for troubleshooting, log analysis, automation, and interview scenarios.
+
+---
+
+# Table of Contents
+
+1. grep
+2. Regular Expressions
+3. sed
+4. awk
+5. cut
+6. grep vs sed vs awk vs cut
+7. Production Scenarios
+8. Troubleshooting
+9. Best Practices
+10. Top Interview Questions
+
+---
+
+# 1. grep
+
+## Interview Question
+
+### Explain grep.
+
+### Answer
+
+`grep` stands for **Global Regular Expression Print**.
+
+It searches files or command output for matching patterns and displays only the matching lines.
+
+It is one of the most commonly used Linux commands for log analysis and troubleshooting.
+
+Syntax
+
+```bash
+grep [options] pattern filename
+```
+
+Example
+
+```bash
+grep root /etc/passwd
+```
+
+Output
+
+```
+root:x:0:0:root:/root:/bin/bash
+```
+
+---
+
+## Interview Question
+
+### Why do DevOps engineers use grep frequently?
+
+### Answer
+
+In production, log files are often several gigabytes in size.
+
+Opening them in an editor is inefficient.
+
+Instead, grep quickly filters only the required information.
+
+Common use cases include
+
+- Finding errors
+- Searching logs
+- Checking service failures
+- Finding failed SSH logins
+- Searching configuration files
+
+---
+
+## Important grep Options
+
+### Ignore Case
+
+```bash
+grep -i error app.log
+```
+
+Matches
+
+```
+ERROR
+
+Error
+
+error
+```
+
+---
+
+### Show Line Numbers
+
+```bash
+grep -n nginx nginx.conf
+```
+
+Useful while editing configuration files.
+
+---
+
+### Invert Match
+
+```bash
+grep -v root /etc/passwd
+```
+
+Displays everything except lines containing root.
+
+---
+
+### Count Matches
+
+```bash
+grep -c ERROR app.log
+```
+
+Useful for counting failures.
+
+---
+
+### Recursive Search
+
+```bash
+grep -r database /etc
+```
+
+Searches every file inside /etc.
+
+---
+
+### Exact Word
+
+```bash
+grep -w root file
+```
+
+Matches only "root".
+
+Does not match
+
+```
+rootuser
+```
+
+---
+
+### Display Context
+
+Show 3 lines after
+
+```bash
+grep -A3 ERROR app.log
+```
+
+Show 3 lines before
+
+```bash
+grep -B3 ERROR app.log
+```
+
+Show both
+
+```bash
+grep -C3 ERROR app.log
+```
+
+Very useful while debugging production applications.
+
+---
+
+# 2. Regular Expressions
+
+## Interview Question
+
+### Explain regular expressions used with grep.
+
+| Pattern | Meaning |
+|----------|----------|
+| ^ | Beginning of line |
+| $ | End of line |
+| . | Any character |
+| * | Zero or more |
+| [] | Character range |
+| [0-9] | Digits |
+| [a-z] | Lowercase |
+| [A-Z] | Uppercase |
+
+Examples
+
+Beginning with root
+
+```bash
+grep "^root" /etc/passwd
+```
+
+Ending with bash
+
+```bash
+grep "bash$" /etc/passwd
+```
+
+Only numbers
+
+```bash
+grep "[0-9]" file
+```
+
+---
+
+# Production Scenario
+
+Application team says users cannot login.
+
+First step
+
+```bash
+grep Failed /var/log/secure
+```
+
+Check
+
+```bash
+grep sshd /var/log/secure
+```
+
+Then
+
+```bash
+grep "Invalid user" /var/log/secure
+```
+
+This immediately narrows the investigation.
+
+---
+
+# 3. sed
+
+## Interview Question
+
+### Explain sed.
+
+### Answer
+
+sed stands for **Stream Editor**.
+
+It is used to
+
+- Replace text
+- Delete lines
+- Insert text
+- Modify configuration files
+- Perform batch editing
+
+Unlike vi, sed edits files non-interactively.
+
+---
+
+## Replace Text
+
+```bash
+sed 's/http/https/' file
+```
+
+Only first occurrence.
+
+---
+
+Replace every occurrence
+
+```bash
+sed 's/http/https/g' file
+```
+
+---
+
+Edit file directly
+
+```bash
+sed -i 's/http/https/g' config.conf
+```
+
+---
+
+Delete line 5
+
+```bash
+sed '5d' file
+```
+
+---
+
+Delete blank lines
+
+```bash
+sed '/^$/d' file
+```
+
+---
+
+Replace only line 10
+
+```bash
+sed '10s/8080/9090/' application.properties
+```
+
+---
+
+Insert before line 5
+
+```bash
+sed '5i New Line' file
+```
+
+---
+
+Append after line 5
+
+```bash
+sed '5a New Line' file
+```
+
+---
+
+## Production Scenario
+
+Application moves from HTTP to HTTPS.
+
+Instead of editing hundreds of files manually,
+
+```bash
+sed -i 's/http/https/g' *.conf
+```
+
+---
+
+## Interview Follow-up
+
+Why use sed instead of vi?
+
+Because sed supports automation and scripting without manual editing.
+
+---
+
+# 4. awk
+
+## Interview Question
+
+### Explain awk.
+
+### Answer
+
+awk is a powerful text processing language.
+
+It works on columns (fields).
+
+Unlike cut, awk supports
+
+- Conditions
+- Calculations
+- Loops
+- Variables
+- Reports
+
+---
+
+## Print First Column
+
+```bash
+awk '{print $1}' file
+```
+
+---
+
+Delimiter Example
+
+```bash
+awk -F: '{print $1}' /etc/passwd
+```
+
+Displays usernames.
+
+---
+
+Print entire line
+
+```bash
+awk '{print $0}' file
+```
+
+---
+
+Print last field
+
+```bash
+awk '{print $NF}' file
+```
+
+---
+
+Line Number
+
+```bash
+awk '{print NR,$0}' file
+```
+
+---
+
+Display only line 5
+
+```bash
+awk 'NR==5' file
+```
+
+---
+
+Condition
+
+```bash
+awk '$3>100'
+```
+
+Display records where third field is greater than 100.
+
+---
+
+Sum values
+
+```bash
+awk '{sum+=$3}
+END{
+print sum
+}'
+```
+
+---
+
+Average
+
+```bash
+awk '{sum+=$2}
+END{
+print sum/NR
+}'
+```
+
+---
+
+## Production Example
+
+Display usernames
+
+```bash
+awk -F: '{print $1}' /etc/passwd
+```
+
+Generate disk usage report
+
+```bash
+df -h | awk '{print $5}'
+```
+
+---
+
+## Interview Follow-up
+
+Difference between awk and grep?
+
+grep searches.
+
+awk processes.
+
+---
+
+# 5. cut
+
+## Interview Question
+
+Explain cut.
+
+### Answer
+
+cut extracts columns from text.
+
+Unlike awk, cut cannot perform calculations or conditions.
+
+---
+
+Extract usernames
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+---
+
+Extract second column
+
+```bash
+cut -d, -f2 employees.csv
+```
+
+---
+
+Extract characters
+
+```bash
+cut -c1-10 file
+```
+
+---
+
+Production Example
+
+Extract IP addresses
+
+```bash
+cut -d' ' -f1 access.log
+```
+
+---
+
+# grep vs sed vs awk vs cut
+
+| Command | Purpose |
+|----------|----------|
+| grep | Search text |
+| sed | Modify text |
+| awk | Process text |
+| cut | Extract columns |
+
+---
+
+# Production Scenarios
+
+## Scenario 1
+
+Application log is 10 GB.
+
+Wrong approach
+
+```
+Open in vi
+```
+
+Correct approach
+
+```bash
+grep ERROR app.log
+
+grep Exception app.log
+
+tail -f app.log
+```
+
+---
+
+## Scenario 2
+
+Need usernames only.
+
+```bash
+cut -d: -f1 /etc/passwd
+```
+
+or
+
+```bash
+awk -F: '{print $1}' /etc/passwd
+```
+
+---
+
+## Scenario 3
+
+Need to replace database hostname in 500 configuration files.
+
+```bash
+sed -i 's/db-old/db-new/g' *.properties
+```
+
+---
+
+# Best Practices
+
+✅ Use grep for searching.
+
+✅ Use sed for editing.
+
+✅ Use awk for reporting.
+
+✅ Use cut for simple extraction.
+
+Never use awk when cut is sufficient.
+
+Never edit production logs.
+
+Always work on copies when testing sed commands.
+
+---
+
+# Top Interview Questions
+
+1. Explain grep.
+2. Difference between grep and find.
+3. Difference between grep and awk.
+4. Difference between awk and cut.
+5. Difference between sed and awk.
+6. Explain Regular Expressions.
+7. Explain grep -i.
+8. Explain grep -v.
+9. Explain grep -A, -B and -C.
+10. Explain sed -i.
+11. Difference between sed and vi.
+12. Explain awk fields.
+13. What are NR and NF in awk?
+14. Print usernames using awk.
+15. Print usernames using cut.
+16. How do you replace text in multiple files?
+17. How do you remove blank lines using sed?
+18. How do you count errors in logs?
+19. How do you search recursively?
+20. Which command do you use for production log analysis?
+
+---
+
+# Quick Revision
+
+| Command | Remember |
+|----------|----------|
+| grep | Search |
+| sed | Edit |
+| awk | Process |
+| cut | Extract |
+| grep -i | Ignore case |
+| grep -v | Exclude match |
+| grep -n | Line numbers |
+| grep -A/-B/-C | Context |
+| sed -i | Edit file |
+| awk -F | Field separator |
+| NR | Record number |
+| NF | Number of fields |
+
+---
+
+## Part 2 Complete ✅
+
+**Next Part:** Pipes, Redirection, sort, uniq, wc, tr, xargs, File Commands, Display Commands, and System Information with production scenarios and interview questions.
