@@ -227,6 +227,8 @@ Encrypted (SSH-based) replacement for legacy `rcp`/`ftp`.
 
 ## 11. Squid Proxy Server
 
+Squid Proxy Server is an open-source proxy and web caching server used to improve network performance, reduce bandwidth usage, and control internet access. It acts as an intermediary between client systems and the internet. When a user requests a webpage, Squid first checks its local cache. If the content is available and valid, it serves it directly from the cache, reducing response time. If not, it fetches the content from the internet, delivers it to the client, and stores a copy for future requests. Squid also supports access control through ACLs, user authentication, URL filtering, logging, and bandwidth management. It is commonly used in enterprise networks, schools, and organizations to optimize internet usage and enforce security policies
+
 ```bash
 dnf install squid* -y
 systemctl enable --now squid
